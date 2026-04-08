@@ -3,8 +3,8 @@ extends Area2D
 signal hit
 
 @export var speed = 400 # How fast the player will move (pixels/sec).
-var min_player_bounds
-var max_player_bounds
+var min_player_bounds: Vector2
+var max_player_bounds: Vector2
 
 func _ready():
 	hide()
@@ -14,29 +14,29 @@ func _ready():
 	max_player_bounds = Vector2(screen_size.x - collisionShape.radius, screen_size.y - (collisionShape.height / 2))
 
 func _process(delta):
-	var input_vector = get_movement_input_vector()
+	var input_vector = _get_movement_input_vector()
 	
 	var velocity = input_vector.normalized() * speed
 	
-	position = calulate_new_position(velocity, delta)
+	position = _calulate_new_position(velocity, delta)
 	
-	animate(velocity)
+	_animate(velocity)
 
-func _on_body_entered(body: Node2D) -> void:	
+func _on_body_entered() -> void:
 	hide()
 	hit.emit()
 	$CollisionShape2D.set_deferred("disabled", true)
 
-func start(pos):
+func _start(pos):
 	position = pos
 	show()
 	$CollisionShape2D.disabled = false
 
-func calulate_new_position(velocity: Vector2, delta: float):
+func _calulate_new_position(velocity: Vector2, delta: float):
 	var newPosition = position + (velocity * delta);
 	return newPosition.clamp(min_player_bounds, max_player_bounds);
 
-func get_movement_input_vector():
+func _get_movement_input_vector():
 	var input_vector: Vector2 = Vector2.ZERO
 	if (Input.is_action_pressed("move_right")):
 		input_vector.x += 1
@@ -52,10 +52,10 @@ func get_movement_input_vector():
 	
 	return input_vector.normalized()
 
-func animate(velocity: Vector2):
+func _animate(velocity: Vector2):
 	if (velocity.length() == 0.0):
 		$AnimatedSprite2D.stop()
-		return;
+		return ;
 
 	if velocity.x != 0:
 		$AnimatedSprite2D.animation = 'walk'
